@@ -1,0 +1,23 @@
+div {
+    margin: 20px 0;
+}
+
+div#container {
+    width: 600px;
+    margin: auto;
+}
+
+div#chart_display {
+    height: 350px;
+    background-color: red;
+}
+
+div#instruction_display {
+    
+}
+
+button {
+    width: 100px;
+    margin: auto;
+    display: block;
+}
