@@ -13,6 +13,16 @@ var instructions = [
     "Task 2 Instructions"
 ];
 
+function initParticipant(p) {
+    participant_number = p;
+    task_type = 0;
+    system_type = participant_number % 3;
+    direction = (participant_number % 2 == 0) ? -1 : 1;
+    round = 0;
+    count = 0;
+    disabled = true;
+}
+
 $(function() {
     $('button#start_btn').click(function() {
         initParticipant(4);
@@ -24,16 +34,18 @@ $(function() {
     $('button#continue_btn').click(function() {
         $('div#chart_display').text('TASK ' + task_type);
         showAnswers();
+        // show chart
     });
 
-    $('button.answer').click(clickAnswer);
+    $('button.answer').click(function() {
+        // stop timer
+        // record answer
+        hideAnswers();
+        // hide chart
+        step();
+        showInstructions();
+    });
 });
-
-function clickAnswer() {
-    hideAnswers();
-    step();
-    showInstructions();
-}
 
 function showInstructions() {
     $('div#instruction_display').text(instructions[system_type]);
@@ -42,29 +54,12 @@ function showInstructions() {
 
 function showAnswers() {
     $('button#continue_btn').hide();
-    $('button#answerA_btn').show();
-    $('button#answerB_btn').show();
+    $('button.answer').show();
 }
 
 function hideAnswers() {
     $('button#continue_btn').show();
-    $('button#answerA_btn').hide();
-    $('button#answerB_btn').hide();
-}
-
-function step() {
-    status = advanceTypes();
-    if (status == -1) console.log('done');
-}
-
-function initParticipant(p) {
-    participant_number = p;
-    task_type = 0;
-    system_type = participant_number % 3;
-    direction = (participant_number % 2 == 0) ? -1 : 1;
-    round = 0;
-    count = 0;
-    disabled = true;
+    $('button.answer').hide();
 }
 
 /*
@@ -72,14 +67,14 @@ function initParticipant(p) {
  * -1: Everything is done.
  * 0 : Good to continue.
  */
-function advanceTypes() {
+function step() {
     var status = 0;
     round += 1;
 
     if (round >= rounds_per_task) {
         count += 1;
         if (count >= 9) {
-            return -1;
+            status = -1;
         }
         else if (task_type == 2) {
             task_type = 0;
@@ -93,5 +88,5 @@ function advanceTypes() {
         round = 0;
     }
 
-    return 0;
+    if (status == -1) console.log('done');
 }
