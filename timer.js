@@ -1,15 +1,13 @@
-var timer = {
-    init: function() {
-        this.timer = 0;
-        this.total_time = 0;
-        this.count = 0;
-    },
+var Timer = function() {
+    this.timer = 0;
+    this.total_time = 0;
+    this.count = 0;
 
-    startTimer: function() {
+    this.startTimer = function() {
         this.timer = Date.now();
-    },
+    }
 
-    stopTimer: function() {
+    this.stopTimer = function() {
         var now = Date.now();
         var dif = now - this.timer;
 
@@ -18,9 +16,9 @@ var timer = {
         this.timer = 0;
 
         return dif;
-    },
+    }
 
-    getAvgTime: function() {
+    this.getAvgTime = function() {
         return this.total_time / this.count;
     }
 }

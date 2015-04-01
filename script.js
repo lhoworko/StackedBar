@@ -8,12 +8,12 @@ var status;
 
 var rounds_per_task = 1;
 var instructions = [
-    "Task 0 Instructions",
-    "Task 1 Instructions",
-    "Task 2 Instructions"
+    "System 0 Instructions",
+    "System 1 Instructions",
+    "System 2 Instructions"
 ];
 
-//var timer;
+var timer;
 
 function initParticipant(p) {
     participant_number = p;
@@ -27,7 +27,7 @@ function initParticipant(p) {
 $(function() {
     $('button#start_btn').click(function() {
         initParticipant(4);
-        timer.init();
+        timer = new Timer();
 
         $(this).hide();
         $('button#continue_btn').show();
@@ -36,7 +36,7 @@ $(function() {
 
     $('button#continue_btn').click(function() {
         $('div#chart_display').text('TASK ' + task_type);
-        showAnswers();
+        startQuestion();
         timer.startTimer();
         // show chart
     });
@@ -49,7 +49,7 @@ $(function() {
         // Record Answer
 
 
-        hideAnswers();
+        endQuestion();
         // hide chart
         step();
         showInstructions();
@@ -61,12 +61,20 @@ function showInstructions() {
     $('div#chart_display').text('');
 }
 
-function showAnswers() {
+function startQuestion() {
+    // Create and show the chart.
+    var chart = new Chart(task_type, system_type);
+    chart.get();
+
+    // Swap the buttons.
     $('button#continue_btn').hide();
     $('button.answer').show();
 }
 
-function hideAnswers() {
+function endQuestion() {
+    // Destroy Chart.
+
+    // Swap the buttons back
     $('button#continue_btn').show();
     $('button.answer').hide();
 }
