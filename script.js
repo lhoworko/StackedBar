@@ -36,23 +36,13 @@ $(function() {
 
     $('button#continue_btn').click(function() {
         //$('div#chart_display').text('TASK ' + task_type);
-        startQuestion();
+        showQuestion();
         timer.startTimer();
         // show chart
     });
 
-    $('button.answer').click(function() {
-        // Stop Timer
-        var time = timer.stopTimer();
-        console.log(time);
-
-        // Record Answer
-
-
-        endQuestion();
-        // hide chart
-        step();
-        showInstructions();
+    d3.select('svg').on('answer', function(d) {
+        console.log(d);
     });
 });
 
@@ -61,22 +51,24 @@ function showInstructions() {
     $('div#chart_display').text('');
 }
 
-function startQuestion() {
+function showQuestion() {
     // Create and show the chart.
     var chart = new Chart(task_type, system_type);
-    //chart.get();
 
-    // Swap the buttons.
     $('button#continue_btn').hide();
-    $('button.answer').show();
 }
 
-function endQuestion() {
+function answerQuestion(answer) {
+    var time = timer.stopTimer();
+    console.log(time);
+    console.log(answer);
+
     // Destroy Chart.
 
-    // Swap the buttons back
     $('button#continue_btn').show();
-    $('button.answer').hide();
+
+    step();
+    showInstructions();
 }
 
 /*

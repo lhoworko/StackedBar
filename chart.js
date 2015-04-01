@@ -70,6 +70,10 @@ Chart.prototype.createStackedChart = function(chart_type, options) {
             .attr("width", function(d) { return options.x(d.x1) - options.x(d.x0); })
             .style("fill", function(d) { return options.color(d.name); });
 
+        company.on('click', function() {
+            answerQuestion(this.id);
+        });
+
         svg.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + options.height + ")")
