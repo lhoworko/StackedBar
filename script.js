@@ -35,7 +35,7 @@ $(function() {
     });
 
     $('button#continue_btn').click(function() {
-        $('div#chart_display').text('TASK ' + task_type);
+        //$('div#chart_display').text('TASK ' + task_type);
         startQuestion();
         timer.startTimer();
         // show chart
@@ -64,7 +64,7 @@ function showInstructions() {
 function startQuestion() {
     // Create and show the chart.
     var chart = new Chart(task_type, system_type);
-    chart.get();
+    //chart.get();
 
     // Swap the buttons.
     $('button#continue_btn').hide();

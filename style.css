@@ -9,15 +9,35 @@ div#container {
 
 div#chart_display {
     height: 350px;
-    background-color: red;
+    border-radius: 5px;
+    border: 1px solid black;
 }
 
 div#instruction_display {
-    
+
 }
 
 button {
     width: 100px;
     margin: auto;
     display: block;
+}
+
+body {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.bar {
+  fill: steelblue;
+}
+
+.x.axis path {
+  display: none;
 }
