@@ -13,6 +13,8 @@ var instructions = [
     "Task 2 Instructions"
 ];
 
+//var timer;
+
 function initParticipant(p) {
     participant_number = p;
     task_type = 0;
@@ -20,12 +22,13 @@ function initParticipant(p) {
     direction = (participant_number % 2 == 0) ? -1 : 1;
     round = 0;
     count = 0;
-    disabled = true;
 }
 
 $(function() {
     $('button#start_btn').click(function() {
         initParticipant(4);
+        timer.init();
+
         $(this).hide();
         $('button#continue_btn').show();
         showInstructions();
@@ -34,12 +37,18 @@ $(function() {
     $('button#continue_btn').click(function() {
         $('div#chart_display').text('TASK ' + task_type);
         showAnswers();
+        timer.startTimer();
         // show chart
     });
 
     $('button.answer').click(function() {
-        // stop timer
-        // record answer
+        // Stop Timer
+        var time = timer.stopTimer();
+        console.log(time);
+
+        // Record Answer
+
+
         hideAnswers();
         // hide chart
         step();
@@ -88,5 +97,5 @@ function step() {
         round = 0;
     }
 
-    if (status == -1) console.log('done');
+    if (status == -1) console.log('avg:' + timer.getAvgTime());
 }
