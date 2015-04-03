@@ -38,6 +38,6 @@ body {
   fill: steelblue;
 }
 
-.x.axis path {
+.y.axis path {
   display: none;
 }
