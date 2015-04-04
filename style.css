@@ -28,7 +28,8 @@ body {
 }
 
 .axis path,
-.axis line {
+.axis line,
+path#midAxis {
   fill: none;
   stroke: #000;
   shape-rendering: crispEdges;

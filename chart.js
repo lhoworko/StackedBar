@@ -19,9 +19,10 @@ Chart.prototype.createOptions = function() {
     options.y = d3.scale.ordinal()
         .rangeRoundBands([options.height, 0], .1);
 
-    options.x = d3.scale.linear()
-        .domain([0, 1])
-        .rangeRound([0, options.width]);
+    options.x = d3.scale.linear();
+    options.x2 = d3.scale.linear();
+        /*.domain([0, 1])
+        .rangeRound([0, options.width]);*/
 
     options.xx = [];
     for (var i = 0; i < 6; i++) {
@@ -59,7 +60,6 @@ Chart.prototype.newChart = function(system_type, task_type, count) {
         d.values = options.color.domain().map(function(name) {
             return { name: name, x0: x0, x1: x0 += +d[name] };
         });
-
 
         d.total = d.values[d.values.length - 1].x1;
     });
@@ -101,13 +101,37 @@ Chart.prototype.newChart = function(system_type, task_type, count) {
         });
     }
 
+    if (system_type == 2) {
+        options.x
+            .domain([0, 0.5])
+            .rangeRound([0, options.width / 2]);
+
+        options.x2
+            .domain([0.5, 0])
+            .rangeRound([0, options.width / 2]);
+    } else {
+        options.x
+            .domain([0, 1])
+            .rangeRound([0, options.width]);
+    }
+
     var xAxis = d3.svg.axis()
         .scale(options.x)
-        .orient("bottom");
+        .orient("bottom")
+        .ticks(system_type == 2 ? 5 : 10);
 
     var yAxis = d3.svg.axis()
         .scale(options.y)
         .orient("left");
+
+    var xAxis2;
+
+    if (system_type == 2) {
+        xAxis2 = d3.svg.axis()
+            .scale(options.x2)
+            .orient('bottom')
+            .ticks(5);
+    }
 
     var svg = d3.select("div#chart_display").append("svg")
         .attr("width", options.width + options.margin.left + options.margin.right)
@@ -149,12 +173,34 @@ Chart.prototype.newChart = function(system_type, task_type, count) {
 
     svg.append("g")
         .attr("class", "x axis")
-        .attr("transform", "translate(0," + options.height + ")")
+        .attr("transform", function() {
+            if (system_type == 2) {
+                return "translate(" + options.width / 2 + "," + options.height + ")";
+            }
+            return "translate(0," + options.height + ")";
+        })
         .call(xAxis);
+
+    if (system_type == 2) {
+        svg.append("g")
+            .attr("class", "x2 axis")
+            .attr("transform", function() {
+                return "translate(0," + options.height + ")";
+            })
+            .call(xAxis2);
+
+        // insert vertical line at center
+        svg.append('path')
+            .attr('id', 'midAxis')
+            .attr('d', 'M' + options.width / 2 + ' 0 V' + options.height);
+
+    }
 
     svg.append("g")
         .attr("class", "y axis")
         .call(yAxis);
+
+        console.log(data);
 
     /*var legend = svg.selectAll(".legend")
         .data(color.domain().slice().reverse())
