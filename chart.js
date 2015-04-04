@@ -3,6 +3,12 @@ var Chart = function(data) {
     this.data = data;
 }
 
+function shouldInvert(system_type, attribute) {
+    if ((system_type == 1 || system_type == 2) && invert.indexOf(attribute) > -1)
+        return true;
+    return false;
+}
+
 Chart.prototype.createOptions = function() {
     var options = {};
 
@@ -14,6 +20,7 @@ Chart.prototype.createOptions = function() {
         .rangeRoundBands([options.height, 0], .1);
 
     options.x = d3.scale.linear()
+        .domain([0, 1])
         .rangeRound([0, options.width]);
 
     options.xx = [];
@@ -36,15 +43,23 @@ Chart.prototype.newChart = function(system_type, task_type, count) {
         this.data[data_order[count * 2 + 1]]
     ];
 
-    var x = options.x;
-    var y = options.y;
-
     data.forEach(function(d) {
         var x0 = 0;
+
+        if (system_type == 1 || system_type == 2) {
+            // Need to invert some values.
+            for (a in invert) {
+                if (d[invert[a]] == 0) {
+                    d[invert[a]] = 0.0001;
+                }
+                d[invert[a]] = 1 / d[invert[a]];
+            }
+        }
 
         d.values = options.color.domain().map(function(name) {
             return { name: name, x0: x0, x1: x0 += +d[name] };
         });
+
 
         d.total = d.values[d.values.length - 1].x1;
     });
@@ -52,24 +67,43 @@ Chart.prototype.newChart = function(system_type, task_type, count) {
     var xx = options.xx;
 
     for (var i = 0; i < 6; i++) {
-        xx[i].domain([0, d3.max(
+        xx[i].domain([-0.1, d3.max(
             data, function(d) { return d.values[i].x1 - d.values[i].x0; }
-        )]);
+        ) + 0.1]);
     }
 
-    data.forEach(function(d) {
-        var shift = 0;
+    if (system_type == 0 || system_type == 1) { // Normal stacked bar or with inversion
+        data.forEach(function(d) {
+            var shift = 0;
 
-        for (var i = 0; i < 6; i++) {
-            d.values[i].shift = shift;
-            shift += xx[i](d.values[i].x1 - d.values[i].x0);
-        }
-    });
+            for (var i = 0; i < 6; i++) {
+                d.values[i].shift = shift;
+                shift += xx[i](d.values[i].x1 - d.values[i].x0);
+            }
+        });
+    } else if (system_type == 2) {  // Diverging stacked bar with inversion
+        data.forEach(function(d) {
+            var shift = options.width / 2;
+
+            for (var i = 0; i < 3; i++) {
+                // first 3 on right
+                d.values[i].shift = shift;
+                shift += xx[i](d.values[i].x1 - d.values[i].x0);
+            }
+
+            shift = options.width / 2;
+
+            for (var i = 5; i > 2; i--) {
+                // 2nd 3 on left.
+                shift -= xx[i](d.values[i].x1 - d.values[i].x0);
+                d.values[i].shift = shift;
+            }
+        });
+    }
 
     var xAxis = d3.svg.axis()
         .scale(options.x)
-        .orient("bottom")
-        .tickFormat(d3.format('.2s'));
+        .orient("bottom");
 
     var yAxis = d3.svg.axis()
         .scale(options.y)
@@ -81,8 +115,7 @@ Chart.prototype.newChart = function(system_type, task_type, count) {
         .append("g")
         .attr("transform", "translate(" + options.margin.left + "," + options.margin.top + ")");
 
-    y.domain(data.map(function(d) { return d.Company; }));
-    x.domain([0, d3.max(data, function(d) { return d.total; })]);
+    options.y.domain(data.map(function(d) { return d.Company; }));
 
     var company = svg.selectAll(".company")
         .data(data)
@@ -99,7 +132,16 @@ Chart.prototype.newChart = function(system_type, task_type, count) {
             return d.shift;
         })
         .attr("width", function(d, i) { return xx[i](d.x1 - d.x0) })
-        .style("fill", function(d) { return options.color(d.name); });
+        .style("fill", function(d) {
+            return options.color(d.name);
+        })
+        .style('stroke', function(d) {
+            if (shouldInvert(system_type, d.name)) {
+                return 'black';
+            }
+            return options.color(d.name);
+        })
+        .style('stroke-width', 2);
 
     company.on('click', function() {
         answerQuestion(this.id);
