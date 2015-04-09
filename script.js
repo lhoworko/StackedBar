@@ -9,8 +9,8 @@ var status;
 
 var num_systems = 3;
 var num_tasks = 3;
-var rounds_per_task = 2;
-//var stock_order;
+var rounds_per_task = 1;
+
 var data_order;
 var timer;
 var chart;
@@ -20,6 +20,8 @@ var instructions = [
     "System 1 Instructions",
     "System 2 Instructions"
 ];
+
+var timers = [];
 
 function initParticipant(p) {
     participant_number = p;
@@ -37,10 +39,28 @@ function initParticipant(p) {
     });
 }
 
+function initTimers() {
+    for (var i = 0; i < num_systems; i++) {
+        timers[i] = [];
+        for (var j = 0; j < num_tasks; j++) {
+            timers[i][j] = new Timer();
+        }
+    }
+}
+
+function printTimers() {
+    $('div#chart_display').text('');
+    for (var i = 0; i < num_systems; i++) {
+        for (var j = 0; j < num_tasks; j++) {
+            console.log('timer ' + i + ' ' + j + ': ' + timers[i][j].getAvgTime());
+        }
+     }
+}
+
 $(function() {
     $('button#start_btn').click(function() {
         initParticipant(4);
-        timer = new Timer();
+        initTimers();
 
         $(this).hide();
         $('button#continue_btn').show();
@@ -56,26 +76,27 @@ function showInstructions() {
 }
 
 function showQuestion() {
-    timer.startTimer();
+    timers[system_type][task_type].startTimer();
+
     // Create and show the chart.
-    //var chart = new Chart(task_type, system_type);
     chart.newChart(system_type, task_type, total_count);
 
     $('button#continue_btn').hide();
 }
 
 function answerQuestion(answer) {
-    var time = timer.stopTimer();
-    //chart.removeChart();
-    console.log(time);
+    timers[system_type][task_type].stopTimer();
     console.log(answer);
 
-    // Destroy Chart.
-
-    $('button#continue_btn').show();
-
-    step();
-    showInstructions();
+    var s = step();
+    if (s == -1) {
+        // Done.
+        $('div#chart_display').text('');
+        printTimers();
+    } else {
+        $('button#continue_btn').show();
+        showInstructions();
+    }
 }
 
 /*
@@ -105,5 +126,5 @@ function step() {
         round = 0;
     }
 
-    if (status == -1) console.log('avg:' + timer.getAvgTime());
+    return status;
 }
