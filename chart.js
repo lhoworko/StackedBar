@@ -40,8 +40,8 @@ Chart.prototype.createOptions = function() {
 Chart.prototype.newChart = function(system_type, task_type, count) {
     var options = this.options;
     var data = [
-        this.data[data_order[count * 2]],
-        this.data[data_order[count * 2 + 1]]
+        this.data[count * 2],
+        this.data[count * 2 + 1]
     ];
 
     data.forEach(function(d) {
