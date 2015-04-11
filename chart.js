@@ -14,7 +14,7 @@ var Chart = function(data) {
     }
 
     this.y3 = d3.scale.ordinal()
-        .rangeRoundBands([this.height, 0], 0.1);
+        .rangeRoundBands([this.height, 0], 0.3);
 
     this.svg = d3.select("div#chart_display").append("svg")
         .attr("width", this.width + this.margin3.left + this.margin3.right)
@@ -27,7 +27,6 @@ var Chart = function(data) {
 
     this.yAxis_display = this.svg.append("g")
         .attr("class", "y axis");
-
 }
 
 Chart.prototype.updateChart = function(system, task, count) {

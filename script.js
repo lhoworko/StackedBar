@@ -12,6 +12,7 @@ var rounds_per_task = 1;
 
 var timer;
 var chart;
+var results;
 
 var instructions = [
     "System 0 Instructions",
@@ -23,6 +24,7 @@ $(function() {
     $('button#start_btn').click(function() {
         system_type = participant_number % num_systems;
         timer = new Timer();
+        initResults();
 
         downloadData(function(data) {
             chart = new Chart(data);
@@ -36,30 +38,51 @@ $(function() {
     $('button#continue_btn').click(showQuestion);
 });
 
+function initResults() {
+    results = [];
+    for (var i = 0; i < num_systems; i++) {
+        results.push([]);
+
+        for (var j = 0; j < num_tasks; j++) {
+            results[i].push([]);
+        }
+    }
+}
+
+function newResult(system, task, correct, time) {
+    results[system][task].push({
+        "correct": correct,
+        "time": time
+    });
+}
+
 function showInstructions() {
     $('div#instruction_display').text(instructions[system_type]);
-    $('div#chart_display').hide();
+    $('div#chart_display svg').hide();
 }
 
 function showQuestion() {
     timer.startTimer();
 
     // Create and show the chart.
-    $('div#chart_display').show();
+    $('div#chart_display svg').show();
     chart.updateChart(system_type, task_type, total_count);
 
     $('button#continue_btn').hide();
 }
 
 function answerQuestion(answer) {
-    timer.stopTimer();
-    console.log(answer);
+    var time = timer.stopTimer();
+    var correct = answer;
+    //var correct = false;
+
+    newResult(system_type, task_type, correct, time);
 
     var s = step();
-    if (s == -1) {
-        // Done.
+    if (s == -1) { // Done.
         $('div#chart_display').text('');
         console.log(timer.getAvgTime());
+        console.log(results);
     } else {
         $('button#continue_btn').show();
         showInstructions();
