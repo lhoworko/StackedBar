@@ -1,3 +1,5 @@
+var participant_number = 0;
+
 var task_type = 0;
 var system_type;
 
@@ -17,39 +19,14 @@ var instructions = [
     "System 2 Instructions"
 ];
 
-var timers = [];
-
-function initParticipant(participant_number) {
-    system_type = participant_number % num_systems;
-
-    downloadData(function() {
-        chart = new Chart(data);
-    });
-}
-
-function initTimers() {
-    for (var i = 0; i < num_systems; i++) {
-        timers[i] = [];
-        for (var j = 0; j < num_tasks; j++) {
-            timers[i][j] = new Timer();
-        }
-    }
-}
-
-function printTimers() {
-    $('div#chart_display').text('');
-    for (var i = 0; i < num_systems; i++) {
-        for (var j = 0; j < num_tasks; j++) {
-            console.log('timer ' + i + ' ' + j + ': ' + timers[i][j].getAvgTime());
-        }
-     }
-}
-
 $(function() {
     $('button#start_btn').click(function() {
-        initParticipant(4);
-        initTimers();
-        //initChart();
+        system_type = participant_number % num_systems;
+        timer = new Timer();
+
+        downloadData(function(data) {
+            chart = new Chart(data);
+        });
 
         $(this).hide();
         $('button#continue_btn').show();
@@ -61,27 +38,28 @@ $(function() {
 
 function showInstructions() {
     $('div#instruction_display').text(instructions[system_type]);
-    $('div#chart_display').text('');
+    $('div#chart_display').hide();
 }
 
 function showQuestion() {
-    timers[system_type][task_type].startTimer();
+    timer.startTimer();
 
     // Create and show the chart.
-    chart.newChart(system_type, task_type, total_count);
+    $('div#chart_display').show();
+    chart.updateChart(system_type, task_type, total_count);
 
     $('button#continue_btn').hide();
 }
 
 function answerQuestion(answer) {
-    timers[system_type][task_type].stopTimer();
+    timer.stopTimer();
     console.log(answer);
 
     var s = step();
     if (s == -1) {
         // Done.
         $('div#chart_display').text('');
-        printTimers();
+        console.log(timer.getAvgTime());
     } else {
         $('button#continue_btn').show();
         showInstructions();
