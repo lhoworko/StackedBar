@@ -6,9 +6,9 @@ var system_type;
 var round = -1;
 var total_count = 0;
 
-var num_systems = 3;
-var num_tasks = 2;
-var rounds_per_task = 3;
+var NUM_SYSTEMS = 3;
+var NUM_TASKS = 2;
+var ROUNDS_PER_TASK = 1;
 
 var timer;
 var chart;
@@ -22,7 +22,7 @@ var instructions = [
 
 $(function() {
     $('button#start_btn').click(function() {
-        system_type = participant_number % num_systems;
+        system_type = participant_number % NUM_SYSTEMS;
         timer = new Timer();
         initResults();
 
@@ -40,10 +40,10 @@ $(function() {
 
 function initResults() {
     results = [];
-    for (var i = 0; i < num_systems; i++) {
+    for (var i = 0; i < NUM_SYSTEMS; i++) {
         results.push([]);
 
-        for (var j = 0; j < num_tasks; j++) {
+        for (var j = 0; j < NUM_TASKS; j++) {
             results[i].push([]);
         }
     }
@@ -62,21 +62,16 @@ function showInstructions() {
 }
 
 function showQuestion() {
-    console.log('system ' + system_type);
-    console.log('task ' + task_type);
-    console.log('round ' + round);
-    console.log('total ' + total_count);
-
     timer.startTimer();
 
     // Create and show the chart.
     $('div#chart_display svg').show();
 
-    if (round == -1) {
-        // Practice round
-        chart.updateChart(system_type, task_type,
-                ((num_systems * num_tasks * rounds_per_task) +
-                ((2 * system_type) + task_type)));
+    if (round == -1) { // Practice round
+        chart.updateChart(system_type, task_type, (
+            (NUM_SYSTEMS * NUM_TASKS * ROUNDS_PER_TASK) +
+            ((2 * system_type) + task_type)
+        ));
     } else {
         chart.updateChart(system_type, task_type, total_count);
     }
@@ -87,14 +82,25 @@ function showQuestion() {
 function answerQuestion(answer) {
     var time = timer.stopTimer();
     var correct = answer;
-    //var correct = false;
+    var s;
 
-    newResult(system_type, task_type, correct, time);
+    if (round == -1) { // Practice round
+        // If the answer is correct, continue.
+        // If wrong, tell them why and show the question again.
 
-    var s = step();
+        //if (answer is correct) {
+             s = step();
+        //} else {
+            //console.log('wrong');
+            // Show instructions how to answer correctly.
+        //}
+    } else {
+        newResult(system_type, task_type, correct, time);
+        s = step();
+    }
+
     if (s == -1) { // Done.
         $('div#chart_display').text('');
-        console.log(timer.getAvgTime());
         console.log(results);
     } else {
         $('button#continue_btn').show();
@@ -114,17 +120,17 @@ function step() {
         // Not coming out of a practice round
 
         total_count += 1;
-        if (total_count >= (num_systems * num_tasks * rounds_per_task)) {
+        if (total_count >= (NUM_SYSTEMS * NUM_TASKS * ROUNDS_PER_TASK)) {
             return -1;
         }
 
-        if (round == rounds_per_task) {
+        if (round == ROUNDS_PER_TASK) {
             // Going in to practice round
             round = -1;
 
-            task_type = ((task_type + 1) % num_tasks);
+            task_type = ((task_type + 1) % NUM_TASKS);
             if (task_type == 0) {
-                system_type = ((system_type + 1) % num_systems);
+                system_type = ((system_type + 1) % NUM_SYSTEMS);
             }
         }
     }
