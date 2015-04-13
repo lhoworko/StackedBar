@@ -1,4 +1,4 @@
-var participant_number = 0;
+var participant_number = 2;
 
 var task_type = 0;
 var system_type;
@@ -98,6 +98,7 @@ function answerQuestion(answer) {
         newResult(system_type, task_type, correct, time);
         s = step();
     }
+    console.log(chart.data);
 
     if (s == -1) { // Done.
         $('div#chart_display').text('');

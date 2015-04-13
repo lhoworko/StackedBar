@@ -37,30 +37,55 @@ Chart.prototype.updateChart = function(system, task, count) {
         this.data[count * 2 + 1]
     ];
 
+    // Parse and Score the values.
+    for (var i = 0; i < 2; i++) {
+        data[i].score = {};
+        data[i].parsed = {};
+
+        t.colors.domain().forEach(function(attr) {
+            // Parse the values.
+            // I.e. invert them if needed for later.
+            if ((invert.indexOf(attr) > -1) && (system == 1 || system == 2)) {
+                data[i].parsed[attr] = data[(i + 1) % 2][attr];
+            } else {
+                data[i].parsed[attr] = data[i][attr];
+            }
+
+            // Score the values.
+            // The scores are always assuming less is better for those attributes.
+            // Therefore, invert all less is better attributes.
+            if (invert.indexOf(attr) > -1) {
+                data[i].score[attr] = data[(i + 1) % 2][attr];
+            } else {
+                data[i].score[attr] = data[i][attr];
+            }
+        });
+    }
+
+    // Figure out the edges of each single attribute.
+    // Needed to figure out the correct width.
     data.forEach(function(d) {
         var x0 = 0;
-
-        if (system == 1 || system == 2) {
-            // Need to invert some values.
-            for (a in invert) {
-                if (d[invert[a]] == 0) {
-                    d[invert[a]] = 0.0001;
-                }
-                d[invert[a]] = 1 / d[invert[a]];
-            }
-        }
+        d.total_score = 0;
 
         d.values = t.colors.domain().map(function(name) {
-            return { name: name, x0: x0, x1: x0 += +d[name] };
+            return { name: name, x0: x0, x1: x0 += +d.parsed[name] };
         });
-
-        d.total = d.values[d.values.length - 1].x1;
     });
 
+    // Calculate all of the line domains.
+    // As well, calculate all of the line scores.
     for (var i = 0; i < 6; i++) {
-        t.x3[i].domain([-0.1, d3.max(
+        t.x3[i].domain([0, d3.max(
             data, function(d) { return d.values[i].x1 - d.values[i].x0; }
-        ) + 0.1]);
+        )]);
+
+        for (var j = 0; j < 2; j++) {
+            var s = t.x3[i](data[j].score[data[j].values[i].name]);
+
+            data[j].score[data[j].values[i].name] = s;
+            data[j].total_score += s;
+        }
     }
 
     if (system == 0 || system == 1) { // Normal stacked bar or with inversion
@@ -76,8 +101,7 @@ Chart.prototype.updateChart = function(system, task, count) {
         data.forEach(function(d) {
             var shift = t.width / 2;
 
-            for (var i = 0; i < 3; i++) {
-                // first 3 on right
+            for (var i = 0; i < 3; i++) { // first 3 on right
                 d.values[i].shift = shift;
                 shift += t.x3[i](d.values[i].x1 - d.values[i].x0);
             }
