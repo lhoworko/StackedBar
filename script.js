@@ -1,4 +1,14 @@
-var participant_number = 2;
+var participant_number = 0;
+
+var NUM_SYSTEMS = 3;
+var NUM_TASKS = 2;
+var ROUNDS_PER_TASK = 1;
+
+// Don't change these values START
+
+var timer;
+var chart;
+var results;
 
 var task_type = 0;
 var system_type;
@@ -6,18 +16,11 @@ var system_type;
 var round = -1;
 var total_count = 0;
 
-var NUM_SYSTEMS = 3;
-var NUM_TASKS = 2;
-var ROUNDS_PER_TASK = 1;
-
-var timer;
-var chart;
-var results;
+// END
 
 var instructions = [
-    "System 0 Instructions",
-    "System 1 Instructions",
-    "System 2 Instructions"
+    "TASK 0 - Best DEG",
+    "TASK 1 - Best Overall"
 ];
 
 $(function() {
@@ -32,7 +35,8 @@ $(function() {
 
         $(this).hide();
         $('button#continue_btn').show();
-        showInstructions();
+        $('div#instruction_display').text(instructions[task_type]);
+        //showInstructions();
     });
 
     $('button#continue_btn').click(showQuestion);
@@ -57,7 +61,7 @@ function newResult(system, task, correct, time) {
 }
 
 function showInstructions() {
-    $('div#instruction_display').text(instructions[system_type]);
+    $('div#instruction_display').text(instructions[task_type]);
     $('div#chart_display svg').hide();
 }
 
@@ -81,31 +85,55 @@ function showQuestion() {
 
 function answerQuestion(answer) {
     var time = timer.stopTimer();
-    var correct = answer;
     var s;
+    var correct_answer;
+
+    $('div#chart_display svg').hide();
 
     if (round == -1) { // Practice round
+        correct_answer = getCorrectAnswer(task_type, (
+            (NUM_SYSTEMS * NUM_TASKS * ROUNDS_PER_TASK) +
+            ((2 * system_type) + task_type)
+        ));
+
         // If the answer is correct, continue.
         // If wrong, tell them why and show the question again.
-
-        //if (answer is correct) {
+        if (answer == correct_answer) {
              s = step();
-        //} else {
-            //console.log('wrong');
+        } else {
             // Show instructions how to answer correctly.
-        //}
+            console.log('wrong');
+            $('div#chart_display svg').show();
+        }
     } else {
-        newResult(system_type, task_type, correct, time);
+        correct_answer = getCorrectAnswer(task_type, total_count);
+        newResult(system_type, task_type, answer == correct_answer, time);
         s = step();
     }
-    console.log(chart.data);
 
     if (s == -1) { // Done.
-        $('div#chart_display').text('');
         console.log(results);
     } else {
         $('button#continue_btn').show();
-        showInstructions();
+        $('div#instruction_display').text(instructions[task_type]);
+    }
+}
+
+function getCorrectAnswer(task, count) {
+    if (task == 0) { // Lowest DEG
+        if (chart.data[count * 2].score.DGR >
+                chart.data[count * 2 + 1].score.DGR) {
+            return chart.data[count * 2].Company;
+        } else {
+            return chart.data[count * 2 + 1].Company;
+        }
+    } else { // Highest Overall
+        if (chart.data[count * 2].total_score >
+                chart.data[count * 2 + 1].total_score) {
+            return chart.data[count * 2].Company;
+        } else {
+            return chart.data[count * 2 + 1].Company;
+        }
     }
 }
 
