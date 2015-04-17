@@ -9,6 +9,7 @@ var ROUNDS_PER_TASK = 1;
 var timer;
 var chart;
 var results;
+var tar_attr = 'PE Ratio';
 
 var task_type = 0;
 var system_type;
@@ -19,7 +20,7 @@ var total_count = 0;
 // END
 
 var instructions = [
-    "TASK 0 - Best DEG",
+    "TASK 0 - Best " + tar_attr,
     "TASK 1 - Best Overall"
 ];
 
@@ -121,8 +122,8 @@ function answerQuestion(answer) {
 
 function getCorrectAnswer(task, count) {
     if (task == 0) { // Lowest DEG
-        if (chart.data[count * 2].score.DGR >
-                chart.data[count * 2 + 1].score.DGR) {
+        if (chart.data[count * 2].score[tar_attr] >
+                chart.data[count * 2 + 1].score[tar_attr]) {
             return chart.data[count * 2].Company;
         } else {
             return chart.data[count * 2 + 1].Company;
