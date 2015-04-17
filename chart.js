@@ -2,10 +2,10 @@ var Chart = function(data) {
     this.data = data;
 
     this.margin3 = {top: 20, right: 30, bottom: 40, left: 50};
-    this.width = 600 - this.margin3.left - this.margin3.right;
-    this.height = 350 - this.margin3.top - this.margin3.bottom;
+    this.width = $('#chart_display').width() - this.margin3.left - this.margin3.right;
+    this.height = $('#chart_display').height() - this.margin3.top - this.margin3.bottom;
 
-    this.colors = d3.scale.category10()
+    var colors = this.colors = d3.scale.category10()
         .domain(d3.keys(data[0]).filter(function(key) { return key !== "Company"; }));
 
     this.x3 = [];
@@ -27,6 +27,31 @@ var Chart = function(data) {
 
     this.yAxis_display = this.svg.append("g")
         .attr("class", "y axis");
+
+    // Now add the legend.
+    var l_width = $('#legend_display').width(),
+        l_height = $('#legend_display').height();
+
+    var l_svg = d3.select('div#legend_display').append('svg')
+        .attr('width', l_width)
+        .attr('height', l_height);
+
+    var legend = l_svg.selectAll(".legend")
+        .data(colors.domain().slice().reverse())
+        .enter().append("g")
+        .attr("class", "legend")
+        .attr("transform", function(d, i) { return "translate(5," + (5 + (i * 22)) + ")"; });
+
+    legend.append("rect")
+        .attr("width", 18)
+        .attr("height", 18)
+        .style("fill", colors);
+
+    legend.append("text")
+        .attr("x", 21)
+        .attr("y", 9)
+        .attr("dy", ".35em")
+        .text(function(d) { return d; });
 }
 
 Chart.prototype.updateChart = function(system, task, count) {
@@ -156,25 +181,6 @@ Chart.prototype.updateChart = function(system, task, count) {
     });
 
     this.yAxis_display.call(this.yAxis);
-
-    /*var legend = svg.selectAll(".legend")
-        .data(color.domain().slice().reverse())
-        .enter().append("g")
-        .attr("class", "legend")
-        .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
-
-    legend.append("rect")
-        .attr("x", width - 18)
-        .attr("width", 18)
-        .attr("height", 18)
-        .style("fill", color);
-
-    legend.append("text")
-        .attr("x", width - 24)
-        .attr("y", 9)
-        .attr("dy", ".35em")
-        .style("text-anchor", "end")
-        .text(function(d) { return d; });*/
 }
 
 function shouldInvert(system_type, attribute) {

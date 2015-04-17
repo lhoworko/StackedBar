@@ -90,6 +90,7 @@ function answerQuestion(answer) {
     var correct_answer;
 
     $('div#chart_display svg').hide();
+    $('button#continue_btn').show();
 
     if (round == -1) { // Practice round
         correct_answer = getCorrectAnswer(task_type, (
@@ -101,10 +102,12 @@ function answerQuestion(answer) {
         // If wrong, tell them why and show the question again.
         if (answer == correct_answer) {
              s = step();
+
         } else {
             // Show instructions how to answer correctly.
             console.log('wrong');
             $('div#chart_display svg').show();
+            $('button#continue_btn').hide();
         }
     } else {
         correct_answer = getCorrectAnswer(task_type, total_count);
@@ -114,8 +117,8 @@ function answerQuestion(answer) {
 
     if (s == -1) { // Done.
         console.log(results);
+        $('button#continue_btn').hide();
     } else {
-        $('button#continue_btn').show();
         $('div#instruction_display').text(instructions[task_type]);
     }
 }
