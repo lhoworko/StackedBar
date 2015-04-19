@@ -1,4 +1,4 @@
-var participant_number = 0;
+var participant_number = 2;
 
 var NUM_SYSTEMS = 3;
 var NUM_TASKS = 2;
@@ -19,11 +19,6 @@ var total_count = 0;
 
 // END
 
-var instructions = [
-    "TASK 0 - Best " + tar_attr,
-    "TASK 1 - Best Overall"
-];
-
 $(function() {
     $('button#start_btn').click(function() {
         system_type = participant_number % NUM_SYSTEMS;
@@ -36,8 +31,7 @@ $(function() {
 
         $(this).hide();
         $('button#continue_btn').show();
-        $('div#instruction_display').text(instructions[task_type]);
-        //showInstructions();
+        setInstructions(system_type, task_type);
     });
 
     $('button#continue_btn').click(showQuestion);
@@ -61,9 +55,29 @@ function newResult(system, task, correct, time) {
     });
 }
 
-function showInstructions() {
-    $('div#instruction_display').text(instructions[task_type]);
-    $('div#chart_display svg').hide();
+function setInstructions(system, task) {
+    var inst = "";
+
+    switch (task) {
+        case 0:
+            inst += "Single Attribute Comparison. Select the stock that has a lower " + tar_attr + ". ";
+            break;
+        case 1:
+            inst += "Overall Comparison. Assuming that each attribute has an equal weight, select the best overall stock. ";
+            break;
+    }
+
+    switch (system) {
+        case 0:
+            inst += "Note that PE, PEG, and EPS% are all lower is better, while Dividend Yield, ROE, and NY% Growth are all higher is better.";
+            break;
+        case 1:
+        case 2:
+            inst += "Note that the lower is better attributes, PE, PEG, and EPS% have all been inverted to become higher is better. The other 3 attributes are also higher is better.";
+            break;
+    }
+
+    $('div#instruction_display').text(inst);
 }
 
 function showQuestion() {
@@ -119,7 +133,8 @@ function answerQuestion(answer) {
         console.log(results);
         $('button#continue_btn').hide();
     } else {
-        $('div#instruction_display').text(instructions[task_type]);
+        setInstructions(system_type, task_type);
+        //$('div#instruction_display').text(instructions[task_type]);
     }
 }
 

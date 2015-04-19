@@ -1,5 +1,5 @@
 body {
-    font: 13px sans-serif;
+    font: 15px sans-serif;
 }
 
 div {
@@ -39,7 +39,7 @@ button {
 
 .axis path,
 .axis line,
-path#midAxis {
+path#midpath {
   fill: none;
   stroke: #000;
   shape-rendering: crispEdges;

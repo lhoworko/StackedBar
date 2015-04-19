@@ -22,6 +22,16 @@ var Chart = function(data) {
         .append("g")
         .attr("transform", "translate(" + this.margin3.left + "," + this.margin3.top + ")");
 
+    this.svg.append('defs').append('pattern')
+        .attr('id', 'diagonalHatch')
+        .attr('patternUnits', 'userSpaceOnUse')
+        .attr('width', 4)
+        .attr('height', 4)
+      .append('path')
+        .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
+        .attr('stroke', '#000000')
+        .attr('stroke-width', 1.05);
+
     this.yAxis = d3.svg.axis()
         .orient("left");
 
@@ -52,6 +62,10 @@ var Chart = function(data) {
         .attr("y", 9)
         .attr("dy", ".35em")
         .text(function(d) { return d; });
+
+    // Add a vertical line to indicate where the y axis is.
+    this.svg.append('path')
+        .attr('id', 'midpath');
 }
 
 Chart.prototype.updateChart = function(system, task, count) {
@@ -122,6 +136,9 @@ Chart.prototype.updateChart = function(system, task, count) {
                 shift += t.x3[i](d.values[i].x1 - d.values[i].x0);
             }
         });
+
+        this.svg.select('#midpath')
+            .attr('d', 'M-1 0 V' + this.height);
     } else if (system == 2) {  // Diverging stacked bar with inversion
         data.forEach(function(d) {
             var shift = t.width / 2;
@@ -139,6 +156,9 @@ Chart.prototype.updateChart = function(system, task, count) {
                 d.values[i].shift = shift;
             }
         });
+
+        this.svg.select('#midpath')
+            .attr('d', 'M' + this.width / 2 + ' 0 V' + this.height);
     }
 
     this.y3.domain(data.map(function(d) { return d.Company; }));
@@ -160,21 +180,19 @@ Chart.prototype.updateChart = function(system, task, count) {
     company.selectAll("rect")
         .data(function(d) { return d.values; })
         .enter().append("rect")
-        .attr("height", this.y3.rangeBand())
-        .attr("x", function(d, i) {
-            return d.shift;
-        })
+        .attr("x", function(d, i) { return d.shift; })
         .attr("width", function(d, i) { return t.x3[i](d.x1 - d.x0) })
-        .style("fill", function(d) {
-            return t.colors(d.name);
-        })
-        .style('stroke', function(d) {
+        .attr("height", this.y3.rangeBand())
+        .style("fill", function(d) { return t.colors(d.name); })
+        .each(function(d, i) {
             if (shouldInvert(system, d.name)) {
-                return 'black';
+                d3.select(this.parentNode).append('rect')
+                    .attr("x", d.shift)
+                    .attr("width", t.x3[i](d.x1 - d.x0))
+                    .attr("height", t.y3.rangeBand())
+                    .attr('fill', 'url(#diagonalHatch)');
             }
-            return t.colors(d.name);
-        })
-        .style('stroke-width', 2);
+        });
 
     company.on('click', function() {
         answerQuestion(this.id);
