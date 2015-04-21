@@ -2,7 +2,7 @@ var participant_number = 2;
 
 var NUM_SYSTEMS = 3;
 var NUM_TASKS = 2;
-var ROUNDS_PER_TASK = 1;
+var ROUNDS_PER_TASK = 5;
 
 // Don't change these values START
 

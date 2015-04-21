@@ -14,7 +14,7 @@ var Chart = function(data) {
     }
 
     this.y3 = d3.scale.ordinal()
-        .rangeRoundBands([this.height, 0], 0.3);
+        .rangeRoundBands([this.height, 0], 0.5);
 
     this.svg = d3.select("div#chart_display").append("svg")
         .attr("width", this.width + this.margin3.left + this.margin3.right)
@@ -84,7 +84,7 @@ Chart.prototype.updateChart = function(system, task, count) {
         t.colors.domain().forEach(function(attr) {
             // Parse the values.
             // I.e. invert them if needed for later.
-            if ((invert.indexOf(attr) > -1) && (system == 1 || system == 2)) {
+            if (shouldInvert(system, attr)) {
                 data[i].parsed[attr] = data[(i + 1) % 2][attr];
             } else {
                 data[i].parsed[attr] = data[i][attr];
@@ -181,7 +181,9 @@ Chart.prototype.updateChart = function(system, task, count) {
         .data(function(d) { return d.values; })
         .enter().append("rect")
         .attr("x", function(d, i) { return d.shift; })
-        .attr("width", function(d, i) { return t.x3[i](d.x1 - d.x0) })
+        .attr("width", function(d, i) {
+            return t.x3[i](d.x1 - d.x0)
+        })
         .attr("height", this.y3.rangeBand())
         .style("fill", function(d) { return t.colors(d.name); })
         .each(function(d, i) {
@@ -202,7 +204,7 @@ Chart.prototype.updateChart = function(system, task, count) {
 }
 
 function shouldInvert(system_type, attribute) {
-    if ((system_type == 1 || system_type == 2) && invert.indexOf(attribute) > -1)
+    if ((system_type == 1) && invert.indexOf(attribute) > -1)
         return true;
     return false;
 }
