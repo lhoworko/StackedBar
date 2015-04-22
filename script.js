@@ -1,4 +1,4 @@
-var participant_number = 2;
+var participant_number;
 
 var NUM_SYSTEMS = 3;
 var NUM_TASKS = 2;
@@ -21,7 +21,20 @@ var total_count = 0;
 
 $(function() {
     $('button#start_btn').click(function() {
-        system_type = participant_number % NUM_SYSTEMS;
+        participant_number = $('input#part_num').val();
+        system_type = $('input#group_num').val() - 1;
+
+        if ($('input#part_num').val() == '' || $('input#group_num').val() == '' ||
+                isNaN(participant_number) || isNaN(system_type)) {
+            console.log('Must enter a number');
+            return false;
+        }
+
+        if (system_type < 0 || system_type > 2) {
+            console.log('Group number must be between 1 and 3');
+            return false;
+        }
+
         timer = new Timer();
         initResults();
 
@@ -29,7 +42,7 @@ $(function() {
             chart = new Chart(data);
         });
 
-        $(this).hide();
+        $('div#start_info').hide();
         $('button#continue_btn').show();
         setInstructions(system_type, task_type);
     });
