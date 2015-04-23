@@ -3,7 +3,7 @@ var group_number;
 
 var NUM_SYSTEMS = 3;
 var NUM_TASKS = 2;
-var ROUNDS_PER_TASK = 1;
+var ROUNDS_PER_TASK = 5;
 
 // Don't change these values START
 
@@ -86,7 +86,13 @@ function getPrintableResults() {
 }
 
 function setInstructions(system, task) {
-    var inst = "";
+    var inst;
+
+    if (round == -1) {
+        inst = "[Practice Round] - ";
+    } else {
+        inst = "[Round " + (round + 1) + " of " + ROUNDS_PER_TASK + "] - ";
+    }
 
     switch (task) {
         case 0:
