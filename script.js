@@ -1,8 +1,9 @@
 var participant_number;
+var group_number;
 
 var NUM_SYSTEMS = 3;
 var NUM_TASKS = 2;
-var ROUNDS_PER_TASK = 5;
+var ROUNDS_PER_TASK = 1;
 
 // Don't change these values START
 
@@ -22,7 +23,8 @@ var total_count = 0;
 $(function() {
     $('button#start_btn').click(function() {
         participant_number = $('input#part_num').val();
-        system_type = $('input#group_num').val() - 1;
+        group_number = $('input#group_num').val();
+        system_type = group_number - 1;
 
         if ($('input#part_num').val() == '' || $('input#group_num').val() == '' ||
                 isNaN(participant_number) || isNaN(system_type)) {
@@ -66,6 +68,21 @@ function newResult(system, task, correct, time) {
         "correct": correct,
         "time": time
     });
+}
+
+function getPrintableResults() {
+    var part_data = participant_number + ',' + group_number;
+    var s = '';
+
+    for (var i = 0; i < NUM_SYSTEMS; i++) {
+        for (var j = 0; j < NUM_TASKS; j++) {
+            for (var k = 0; k < ROUNDS_PER_TASK; k++) {
+                s += [part_data, i, j, k, +results[i][j][k].correct, results[i][j][k].time].join(',') + '\n';
+            }
+        }
+    }
+
+    return s;
 }
 
 function setInstructions(system, task) {
@@ -143,12 +160,31 @@ function answerQuestion(answer) {
     }
 
     if (s == -1) { // Done.
-        console.log(results);
+        navigator.webkitPersistentStorage.requestQuota(1024 * 1024,
+            function(grantedBytes) {
+                window.webkitRequestFileSystem(PERSISTENT, grantedBytes, onInitFs);
+            }, function(e) {
+                console.log('Error', e);
+            }
+        );
+
         $('button#continue_btn').hide();
     } else {
         setInstructions(system_type, task_type);
-        //$('div#instruction_display').text(instructions[task_type]);
     }
+}
+
+function onInitFs(fs) {
+    fs.root.getFile('results.csv', {create: true}, function(fileEntry) {
+
+        // Create a FileWriter object for our FileEntry (log.txt).
+        fileEntry.createWriter(function(fileWriter) {
+            fileWriter.seek(fileWriter.length);
+
+            var blob = new Blob([getPrintableResults()], {type: 'text/plain'});
+            fileWriter.write(blob);
+        });
+    });
 }
 
 function getCorrectAnswer(task, count) {
