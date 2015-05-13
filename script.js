@@ -105,10 +105,10 @@ function setInstructions(system, task) {
 
     switch (system) {
         case 0:
+        case 2:
             inst += "Note that PE, PEG, and EPS% are all lower is better, while Dividend Yield, ROE, and NY% Growth are all higher is better.";
             break;
         case 1:
-        case 2:
             inst += "Note that the lower is better attributes, PE, PEG, and EPS% have all been inverted to become higher is better. The other 3 attributes are also higher is better.";
             break;
     }
