@@ -96,12 +96,16 @@ function setInstructions(system, task) {
 
     switch (task) {
         case 0:
-            inst += "Single Attribute Comparison. Select the stock that has a lower " + tar_attr + ". ";
+            inst += "Single Attribute Comparison Task. In this task you only need to focus on a singe attribute - " + tar_attr
+                    + " - and select the stock that has the lower " + tar_attr + ". ";
             break;
         case 1:
-            inst += "Overall Comparison. Assuming that each attribute has an equal weight, select the best overall stock. ";
+            inst += "Overall Comparison Task. In this task assume that each attribute has an equal weight and select "
+                    + "the best overall stock. ";
             break;
     }
+
+    inst += "Please try to complete the task carefully and quickly. ";
 
     switch (system) {
         case 0:

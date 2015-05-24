@@ -14,7 +14,7 @@ var Chart = function(data) {
     }
 
     this.y3 = d3.scale.ordinal()
-        .rangeRoundBands([this.height, 0], 0.5);
+        .rangeRoundBands([this.height, 0], 0.55);
 
     this.svg = d3.select("div#chart_display").append("svg")
         .attr("width", this.width + this.margin3.left + this.margin3.right)

@@ -12,7 +12,7 @@ div#container {
 }
 
 div#chart_display, div#legend_display {
-    height: 350px;
+    height: 250px;
     border-radius: 4px;
     border: 1px solid black;
     float: left;
